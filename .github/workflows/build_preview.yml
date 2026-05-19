@@ -4,6 +4,9 @@ name: Preview Builder
 on:
   # Dispatch or Manual triggers
   workflow_dispatch:
+  push:
+    branches:
+      - master
 
 #  push:
 #    branches:
