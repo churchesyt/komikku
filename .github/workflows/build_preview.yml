@@ -132,21 +132,26 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - name: Write google-services.json
-        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
-        uses: DamianReeves/write-file-action@6929a9a6d1807689191dcc8bbe62b54d70a32b42 # v1.3
-        with:
-          path: app/google-services.json
-          contents: ${{ secrets.GOOGLE_SERVICES_JSON }}
-          write-mode: overwrite
+      - name: Write google-services.json (if present)
+        run: |
+          set -e
+          if [ -n "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
+            printf '%s' "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+            echo "Wrote app/google-services.json"
+          else
+            echo "GOOGLE_SERVICES_JSON secret not set or empty; skipping"
+          fi
 
-      - name: Write client_secrets.json
-        if: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON != '' }}
-        uses: DamianReeves/write-file-action@6929a9a6d1807689191dcc8bbe62b54d70a32b42 # v1.3
-        with:
-          path: app/src/main/assets/client_secrets.json
-          contents: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
-          write-mode: overwrite
+      - name: Write client_secrets.json (if present)
+        run: |
+          set -e
+          mkdir -p app/src/main/assets
+          if [ -n "${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}" ]; then
+            printf '%s' "${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}" > app/src/main/assets/client_secrets.json
+            echo "Wrote app/src/main/assets/client_secrets.json"
+          else
+            echo "GOOGLE_CLIENT_SECRETS_JSON secret not set or empty; skipping"
+          fi
 
       - name: Write release keystore
         if: ${{ secrets.SIGNING_KEY != '' }}
