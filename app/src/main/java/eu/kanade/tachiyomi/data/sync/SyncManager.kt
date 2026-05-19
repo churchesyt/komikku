@@ -57,7 +57,7 @@ class SyncManager(
         SYNCYOMI(1),
         GOOGLE_DRIVE(2),
         // KMK -->
-        WebDAV(3),
+        WEB_DAV(3),
         // KMK <--
         ;
 
@@ -142,7 +142,7 @@ class SyncManager(
             }
 
             // KMK -->
-            SyncService.WebDAV -> {
+            SyncService.WEB_DAV -> {
                 WebDavSyncService(context, json, syncPreferences, notifier)
             }
             // KMK <--
@@ -157,7 +157,7 @@ class SyncManager(
 
         if (remoteBackup == null) {
             logcat(LogPriority.DEBUG) { "Skip restore due to network issues" }
-            // should we call showSyncError?
+            notifier.showSyncError("Sync failed. Check sign-in and network")
             return
         }
 
