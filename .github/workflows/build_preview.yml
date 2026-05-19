@@ -133,7 +133,7 @@ jobs:
           distribution: temurin
 
       - name: Write google-services.json
-        if: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
         uses: DamianReeves/write-file-action@6929a9a6d1807689191dcc8bbe62b54d70a32b42 # v1.3
         with:
           path: app/google-services.json
@@ -141,7 +141,7 @@ jobs:
           write-mode: overwrite
 
       - name: Write client_secrets.json
-        if: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+        if: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON != '' }}
         uses: DamianReeves/write-file-action@6929a9a6d1807689191dcc8bbe62b54d70a32b42 # v1.3
         with:
           path: app/src/main/assets/client_secrets.json
@@ -149,7 +149,7 @@ jobs:
           write-mode: overwrite
 
       - name: Write release keystore
-        if: ${{ secrets.SIGNING_KEY }}
+        if: ${{ secrets.SIGNING_KEY != '' }}
         run: |
           set -e
           printf '%s' '${{ secrets.SIGNING_KEY }}' | base64 --decode > app/release-keystore.jks
@@ -161,7 +161,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Build app (with telemetry)
-        if: ${{ secrets.GOOGLE_SERVICES_JSON && secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' && secrets.GOOGLE_CLIENT_SECRETS_JSON != '' }}
         run: ./gradlew assemblePreview -Pinclude-telemetry -Penable-updater
         env:
           RELEASE_KEYSTORE_FILE: ${{ github.workspace }}/app/release-keystore.jks
@@ -170,7 +170,7 @@ jobs:
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Build app (no telemetry)
-        if: ${{ !secrets.GOOGLE_SERVICES_JSON || !secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON == '' || secrets.GOOGLE_CLIENT_SECRETS_JSON == '' }}
         run: ./gradlew assemblePreview -Penable-updater
         env:
           RELEASE_KEYSTORE_FILE: ${{ github.workspace }}/app/release-keystore.jks
